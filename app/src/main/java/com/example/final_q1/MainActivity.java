@@ -23,19 +23,23 @@ import android.widget.Button;
 public class MainActivity extends AppCompatActivity {
 
     final static int LINE = 1, RECTANGLE = 2, CIRCLE = 3, CURVE = 4, ERASE=5, CLEAR=6, EMBO=7, BLUR=8, NONE=0; // 메뉴에서 선택한 것을 구분하기 위해 사용
-    final static int BLACK = 1, RED = 2, BLUE = 3, GREEN = 4, YELLOW=5;
     static int curColor=Color.BLACK;
     static int curShape; // 선택된 도형이 선인지 원인지 사각형인지 저장
     Button btnLine, btnRect, btnCircle, btnCurve, btnErase, btnClear, btnEmbo, btnBlur;
     Button prevButton;
-    static int effectNum=0;
-
+    static int effectNum=NONE;
+    MyGraphicView graphicView;
+    public static
+    Context context;
+    public static boolean clear=false;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         setTitle("Painter");
 
+        context=this;
+        graphicView=(MyGraphicView)findViewById(R.id.graphicView);
         btnLine=(Button)findViewById(R.id.btnLine);
         btnRect=(Button)findViewById(R.id.btnRect);
         btnCircle=(Button)findViewById(R.id.btnCircle);
@@ -50,17 +54,27 @@ public class MainActivity extends AppCompatActivity {
         btnLine.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(clear){
+                    MyGraphicView.MyShapeArrayList.clear();
+                    clear=false;
+                }
                 prevButton.setTextColor(Color.BLACK);
                 btnLine.setTextColor(Color.RED);
                 prevButton=btnLine;
                 MyGraphicView.curShape=LINE;
                 MyGraphicView.color = curColor;
                 MyGraphicView.effectNum=effectNum;
+                graphicView.setVisibility(View.VISIBLE);
+
             }
         });
         btnRect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(clear){
+                    MyGraphicView.MyShapeArrayList.clear();
+                    clear=false;
+                }
                 curShape=RECTANGLE;
                 prevButton.setTextColor(Color.BLACK);
                 btnRect.setTextColor(Color.RED);
@@ -68,11 +82,16 @@ public class MainActivity extends AppCompatActivity {
                 MyGraphicView.curShape=RECTANGLE;
                 MyGraphicView.color = curColor;
                 MyGraphicView.effectNum=effectNum;
+                graphicView.setVisibility(View.VISIBLE);
             }
         });
         btnCircle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(clear){
+                    MyGraphicView.MyShapeArrayList.clear();
+                    clear=false;
+                }
                 curShape=CIRCLE;
                 prevButton.setTextColor(Color.BLACK);
                 btnCircle.setTextColor(Color.RED);
@@ -80,38 +99,53 @@ public class MainActivity extends AppCompatActivity {
                 MyGraphicView.curShape=CIRCLE;
                 MyGraphicView.color = curColor;
                 MyGraphicView.effectNum=effectNum;
+                graphicView.setVisibility(View.VISIBLE);
             }
         });
         btnCurve.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(clear){
+                    MyGraphicView.MyShapeArrayList.clear();
+                    clear=false;
+                }
                 curShape=CURVE;
                 prevButton.setTextColor(Color.BLACK);
                 btnCurve.setTextColor(Color.RED);
                 prevButton=btnCurve;
                 MyGraphicView.curShape=CURVE;
                 MyGraphicView.color = curColor;
+                graphicView.setVisibility(View.VISIBLE);
 
             }
         });
         btnErase.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(clear){
+                    MyGraphicView.MyShapeArrayList.clear();
+                    clear=false;
+                }
                 curShape=ERASE;
                 prevButton.setTextColor(Color.BLACK);
                 btnErase.setTextColor(Color.RED);
                 prevButton=btnErase;
                 MyGraphicView.curShape=ERASE;
                 MyGraphicView.color=Color.WHITE;
+                graphicView.setVisibility(View.VISIBLE);
             }
         });
         btnClear.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                MyGraphicView.clear();
+                MyGraphicView.curShape=CLEAR;
                 prevButton.setTextColor(Color.BLACK);
                 btnClear.setTextColor(Color.RED);
                 prevButton=btnClear;
+                graphicView.setVisibility(View.INVISIBLE);
+               // MyGraphicView.MyShapeArrayList.clear();
+//                MyGraphicView.clear();
+                clear=true;
             }
         });
         btnEmbo.setOnClickListener(new View.OnClickListener() {
@@ -119,18 +153,14 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(effectNum==NONE||effectNum==BLUR){
                     effectNum=EMBO;
-                    EmbossMaskFilter embo = new EmbossMaskFilter(new float[] {2, 2, 2}, 0.5f, 6, 5);
                     MyGraphicView.effectNum=EMBO;
-                    
                     btnEmbo.setTextColor(Color.RED);
                     btnBlur.setTextColor(Color.BLACK);
-                    return;
                 }
                 if(effectNum==EMBO){ // 이미 Embo 효과 적용되어있을때 또버튼 누른 경우
                     btnEmbo.setTextColor(Color.BLACK);
                     effectNum=NONE; // 효과 제거
                     MyGraphicView.effectNum=NONE;
-                    return;
                 }
             }
         });
@@ -139,18 +169,14 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 if(effectNum==NONE||effectNum==EMBO){
                     effectNum=BLUR;
-                    BlurMaskFilter blur = new BlurMaskFilter( 10, BlurMaskFilter.Blur.NORMAL);
                     MyGraphicView.effectNum=BLUR;
-                    MyGraphicView.effect=blur;
                     btnBlur.setTextColor(Color.RED);
                     btnEmbo.setTextColor(Color.BLACK);
-                    return;
                 }
                 if(effectNum==BLUR){
                     effectNum=NONE;
                     MyGraphicView.effectNum=NONE;
                     MyGraphicView.effect=null;
-                    return;
                 }
             }
         });

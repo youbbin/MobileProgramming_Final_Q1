@@ -1,6 +1,7 @@
 package com.example.final_q1;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -8,6 +9,8 @@ import android.graphics.EmbossMaskFilter;
 import android.graphics.MaskFilter;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
@@ -22,23 +25,40 @@ public class MyGraphicView extends View {
     final static int LINE = 1, RECTANGLE = 2, CIRCLE = 3, CURVE = 4, ERASE=5, CLEAR=6, EMBO=7, BLUR=8, NONE=0; // 메뉴에서 선택한 것을 구분하기 위해 사용
     static int curShape; // 선택된 도형이 선인지 원인지 사각형인지 저장
     static int color=Color.BLACK;
-    static int curColor;
     static MaskFilter effect;
     static int effectNum;
     static MyShape currentShape;
     static ArrayList<MyShape> MyShapeArrayList = new ArrayList<>();
+    private static Paint paint;
     public MyGraphicView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
     ArrayList<Point> points;
+    MyGraphicView graphicView;
+
+    public void setEffect(){
+        if(effectNum==NONE){
+            effect=null;
+        }
+        else if(effectNum==EMBO){
+            EmbossMaskFilter embo=new EmbossMaskFilter(new float[] {2, 2, 2}, 0.5f, 6, 5);
+            effect=embo;
+        }
+        else{
+            BlurMaskFilter blur = new BlurMaskFilter( 10, BlurMaskFilter.Blur.NORMAL );
+            effect=blur;
+        }
+    }
 
     public boolean onTouchEvent(MotionEvent event) {
         if(curShape==CURVE||curShape==ERASE){
             switch (event.getAction()){
                 case MotionEvent.ACTION_DOWN:
                     points =new ArrayList<>();
+                    setEffect(); // 효과 적용
                     currentShape=new MyShape(curShape,points);
                     currentShape.color=color;
+
                     currentShape.effect=effect;
                     currentShape.startX = (int) event.getX();
                     currentShape.startY = (int) event.getY();
@@ -60,10 +80,14 @@ public class MyGraphicView extends View {
             }
         }else{
             switch (event.getAction()) {
-
                 case MotionEvent.ACTION_DOWN:
+                    graphicView=((MainActivity)MainActivity.context).graphicView;
+                    graphicView.setVisibility(View.VISIBLE);
+                    //MyShapeArrayList.clear();
                     currentShape = new MyShape(curShape);
                     currentShape.color = color;
+                    setEffect();
+                    currentShape.effect=effect;
                     currentShape.startX = (int) event.getX();
                     currentShape.startY = (int) event.getY();
                     break;
@@ -86,7 +110,7 @@ public class MyGraphicView extends View {
 
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        Paint paint = new Paint();
+        paint = new Paint();
         paint.setAntiAlias(true);
         paint.setStrokeWidth(5);
         paint.setStyle(Paint.Style.STROKE);
@@ -97,29 +121,13 @@ public class MyGraphicView extends View {
         }
         if (currentShape != null) {
             paint.setColor(currentShape.color);
+            paint.setMaskFilter(currentShape.effect);
             drawShape(currentShape, canvas, paint);
         }
     }
 
 
-    private void drawShape(MyShape currentShape, Canvas canvas, Paint paint) {
-        switch (effectNum){
-            case EMBO:
-                paint.setMaskFilter(null);
-                EmbossMaskFilter embo=new EmbossMaskFilter(new float[] {2, 2, 2}, 0.5f, 6, 5);
-                paint.setMaskFilter(embo);
-                currentShape.effect=embo;
-                break;
-            case BLUR:
-                paint.setMaskFilter(null);
-                BlurMaskFilter blur = new BlurMaskFilter( 10, BlurMaskFilter.Blur.NORMAL );
-                paint.setMaskFilter(blur);
-                currentShape.effect=blur;
-                break;
-            case NONE:
-                paint.setMaskFilter(null);
-                currentShape.effect=null;
-        }
+    private static void drawShape(MyShape currentShape, Canvas canvas, Paint paint) {
         switch (currentShape.shape) {
             case LINE:
                 canvas.drawLine(currentShape.startX, currentShape.startY,
@@ -150,9 +158,7 @@ public class MyGraphicView extends View {
 
     private static class MyShape {
         int shape,startX, startY, stopX, stopY, color;
-        Path path;
         MaskFilter effect;
-        int effectNum;
         ArrayList<Point> points;
         public MyShape(int shape) {
             this.shape = shape;
@@ -161,9 +167,5 @@ public class MyGraphicView extends View {
             this.shape=shape;
             this.points=points;
         }
-    }
-
-    public static void clear() {
-
     }
 }
