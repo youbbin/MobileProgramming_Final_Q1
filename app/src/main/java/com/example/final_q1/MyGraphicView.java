@@ -41,11 +41,11 @@ public class MyGraphicView extends View {
             effect=null;
         }
         else if(effectNum==EMBO){
-            EmbossMaskFilter embo=new EmbossMaskFilter(new float[] {2, 2, 2}, 0.5f, 6, 5);
+            EmbossMaskFilter embo=new EmbossMaskFilter(new float[] {1, 1, 1}, 0.4f, 5.0f, 10);
             effect=embo;
         }
         else{
-            BlurMaskFilter blur = new BlurMaskFilter( 10, BlurMaskFilter.Blur.NORMAL );
+            BlurMaskFilter blur = new BlurMaskFilter( 20, BlurMaskFilter.Blur.NORMAL );
             effect=blur;
         }
     }
@@ -57,6 +57,9 @@ public class MyGraphicView extends View {
                     points =new ArrayList<>();
                     setEffect(); // 효과 적용
                     currentShape=new MyShape(curShape,points);
+                    if(curShape==ERASE){
+                        currentShape.color=Color.WHITE;
+                    }
                     currentShape.color=color;
                     currentShape.effect=effect;
                     currentShape.startX = (int) event.getX();
@@ -82,10 +85,9 @@ public class MyGraphicView extends View {
                 case MotionEvent.ACTION_DOWN:
                     graphicView=((MainActivity)MainActivity.context).graphicView;
                     graphicView.setVisibility(View.VISIBLE);
-                    //MyShapeArrayList.clear();
+                    setEffect();
                     currentShape = new MyShape(curShape);
                     currentShape.color = color;
-                    setEffect();
                     currentShape.effect=effect;
                     currentShape.startX = (int) event.getX();
                     currentShape.startY = (int) event.getY();
@@ -143,6 +145,7 @@ public class MyGraphicView extends View {
                 canvas.drawRect(rect, paint);
                 break;
             case CURVE:
+            case ERASE:
                 for(int i =0; i<currentShape.points.size(); i++){
                     Point now=currentShape.points.get(i);//현재 좌표
                     if(now.isDraw){ //move 상태이면

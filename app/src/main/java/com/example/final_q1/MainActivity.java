@@ -115,6 +115,7 @@ public class MainActivity extends AppCompatActivity {
                 prevButton=btnCurve;
                 MyGraphicView.curShape=CURVE;
                 MyGraphicView.color = curColor;
+                MyGraphicView.effectNum=effectNum;
                 graphicView.setVisibility(View.VISIBLE);
 
             }
@@ -132,6 +133,7 @@ public class MainActivity extends AppCompatActivity {
                 prevButton=btnErase;
                 MyGraphicView.curShape=ERASE;
                 MyGraphicView.color=Color.WHITE;
+                MyGraphicView.effectNum=NONE;
                 graphicView.setVisibility(View.VISIBLE);
             }
         });
@@ -143,8 +145,6 @@ public class MainActivity extends AppCompatActivity {
                 btnClear.setTextColor(Color.RED);
                 prevButton=btnClear;
                 graphicView.setVisibility(View.INVISIBLE);
-               // MyGraphicView.MyShapeArrayList.clear();
-//                MyGraphicView.clear();
                 clear=true;
             }
         });
@@ -157,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
                     btnEmbo.setTextColor(Color.RED);
                     btnBlur.setTextColor(Color.BLACK);
                 }
-                if(effectNum==EMBO){ // 이미 Embo 효과 적용되어있을때 또버튼 누른 경우
+                else if(effectNum==EMBO){ // 이미 Embo 효과 적용되어있을때 또버튼 누른 경우
                     btnEmbo.setTextColor(Color.BLACK);
                     effectNum=NONE; // 효과 제거
                     MyGraphicView.effectNum=NONE;
@@ -173,11 +173,10 @@ public class MainActivity extends AppCompatActivity {
                     btnBlur.setTextColor(Color.RED);
                     btnEmbo.setTextColor(Color.BLACK);
                 }
-                if(effectNum==BLUR){
+                else if(effectNum==BLUR){
                     effectNum=NONE;
                     btnBlur.setTextColor(Color.BLACK);
                     MyGraphicView.effectNum=NONE;
-                    MyGraphicView.effect=null;
                 }
             }
         });
