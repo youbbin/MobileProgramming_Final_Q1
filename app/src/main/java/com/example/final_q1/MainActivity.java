@@ -175,6 +175,7 @@ public class MainActivity extends AppCompatActivity {
                 }
                 if(effectNum==BLUR){
                     effectNum=NONE;
+                    btnBlur.setTextColor(Color.BLACK);
                     MyGraphicView.effectNum=NONE;
                     MyGraphicView.effect=null;
                 }

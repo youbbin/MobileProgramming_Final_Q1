@@ -58,7 +58,6 @@ public class MyGraphicView extends View {
                     setEffect(); // 효과 적용
                     currentShape=new MyShape(curShape,points);
                     currentShape.color=color;
-
                     currentShape.effect=effect;
                     currentShape.startX = (int) event.getX();
                     currentShape.startY = (int) event.getY();
